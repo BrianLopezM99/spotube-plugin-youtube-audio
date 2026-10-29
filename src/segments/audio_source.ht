@@ -5,12 +5,14 @@ var YouTubeEngine = spotube_plugin.YouTubeEngine
 
 class Converter {
   static fun toSpotubeMatchObject(res: List) -> List<Map> {
-    return res.map((d){
+    // Live streams never resolve to a playable audio stream
+    return res.where((d) => d["isLive"] != true).map((d){
       return {
         "id": d["id"],
         "title": d["title"],
         "artists": [d["author"]],
-        "duration": d["duration"],
+        // YouTubeEngine returns seconds, Spotube expects microseconds
+        "duration": (d["duration"] ?? 0) * 1000000,
         "thumbnail": d["thumbnail"],
         "externalUri": "https://youtube.com/watch?v=${d["id"]}",
       }.toJson()
