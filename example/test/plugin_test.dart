@@ -18,7 +18,8 @@ Map<String, dynamic> video(String id, {int? duration = 210, bool isLive = false}
 final fakeEngine = YouTubeEngine(
   search: (query) async => [
     video('regular'),
-    video('live', duration: null, isLive: true),
+    // Spotube 5.1.2's NewPipe engine flags regular videos as live
+    video('newpipe', isLive: true),
     video('no-duration', duration: null),
   ],
   getVideo: (id) async => video(id),
@@ -56,7 +57,7 @@ void main() {
     ''');
   });
 
-  test('matches skips live videos and returns duration in microseconds', () async {
+  test('matches keeps every result and returns duration in microseconds', () async {
     final result = await hetu.eval('''
       metadataPlugin.audioSource.matches({
         "name": "Robot Voices",
@@ -65,9 +66,9 @@ void main() {
     ''');
     final matches = List<Map>.from(result);
 
-    expect(matches.map((m) => m['id']), ['regular', 'no-duration']);
+    expect(matches.map((m) => m['id']), ['regular', 'newpipe', 'no-duration']);
     expect(matches[0]['duration'], 210 * 1000000);
-    expect(matches[1]['duration'], 0);
+    expect(matches[2]['duration'], 0);
     expect(matches[0]['externalUri'], 'https://youtube.com/watch?v=regular');
   });
 

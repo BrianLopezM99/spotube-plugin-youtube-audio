@@ -5,8 +5,9 @@ var YouTubeEngine = spotube_plugin.YouTubeEngine
 
 class Converter {
   static fun toSpotubeMatchObject(res: List) -> List<Map> {
-    // Live streams never resolve to a playable audio stream
-    return res.where((d) => d["isLive"] != true).map((d){
+    // Don't filter on "isLive": Spotube 5.1.2's NewPipe engine reports it
+    // inverted, so every regular video comes back as live
+    return res.map((d){
       return {
         "id": d["id"],
         "title": d["title"],
