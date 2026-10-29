@@ -61,11 +61,12 @@ class AudioSourceEndpoint {
   fun streams(match: Map) -> List {
     return yt.streamManifest(match["id"]).then((manifest){
       return manifest.map((stream){
+        // YouTube only serves lossy audio: AAC in mp4 and Opus in webm
         return {
           "url": stream["url"],
           "container": stream["container"],
-          "type": "lossless",
-          "codec": "aac",
+          "type": "lossy",
+          "codec": stream["container"] == "webm" ? "opus" : "aac",
           "bitrate": stream["bitrate"],
         }.toJson()
       }).toList()
